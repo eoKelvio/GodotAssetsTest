@@ -1,0 +1,81 @@
+[gd_scene load_steps=8 format=3 uid="uid://dmi4b53p41g7v"]
+
+[ext_resource type="Texture2D" uid="uid://cnqs3fhgd7qmg" path="res://Assets/Sprites/Tilesets/Walls/wooden_door_b.png" id="1_lhyq1"]
+[ext_resource type="Script" path="res://Assets/Scripts/DoorComponent.cs" id="1_vh854"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5gj8n"]
+size = Vector2(20, 9)
+
+[sub_resource type="Animation" id="Animation_ycx51"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_p4d08"]
+resource_name = "close"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [1, 0]
+}
+
+[sub_resource type="Animation" id="Animation_bwu7o"]
+resource_name = "open"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [0, 1]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_scq13"]
+_data = {
+"RESET": SubResource("Animation_ycx51"),
+"close": SubResource("Animation_p4d08"),
+"open": SubResource("Animation_bwu7o")
+}
+
+[node name="DoorComponent" type="Area2D"]
+script = ExtResource("1_vh854")
+teleportPosition = Vector2(1200, 27)
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("1_lhyq1")
+hframes = 2
+
+[node name="Collision" type="CollisionShape2D" parent="."]
+position = Vector2(0, 13)
+shape = SubResource("RectangleShape2D_5gj8n")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_scq13")
+}
+
+[connection signal="body_entered" from="." to="." method="OnBodyEntered"]
+[connection signal="animation_finished" from="AnimationPlayer" to="." method="OnAnimationFinished"]

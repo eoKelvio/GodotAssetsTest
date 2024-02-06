@@ -5,10 +5,9 @@ using System.Security.AccessControl;
 
 public partial class Player : CharacterBody2D {
 
-	
+	public AnimationPlayer animationPlayer;
 	public AnimationTree animationTree = null;
 	public AnimationNodeStateMachinePlayback stateMachine;
-	
 	private Vector2 motion;
 	private float speed = 64f;
 	private float acceleration = 0.4f;
@@ -18,6 +17,9 @@ public partial class Player : CharacterBody2D {
 	private Sprite2D sprite;
 	private Timer attackTimer;
 	private AnimationMixer animationMixer;
+	public bool isDead = false;
+	private Slime slime;
+	
 
 	public void GetInput(){
 		motion = Input.GetVector("move_left", "move_right", "move_up", "move_down");
@@ -41,13 +43,13 @@ public partial class Player : CharacterBody2D {
 		stateMachine = (AnimationNodeStateMachinePlayback)animationTree.Get("parameters/playback");
 		animationMixer = GetNode<AnimationMixer>("AnimationTree");
 		animationMixer.Active = true;
-	}
-
-	public override void _Process(double delta){
+		AddToGroup("Player");
 	}
 
 	public override void _PhysicsProcess(double delta){
-		
+		if (isDead == true)
+		return;
+
 		GetInput();
 		UpdateAnimation();
 		Attack();
@@ -80,9 +82,18 @@ public partial class Player : CharacterBody2D {
 		attacking = false;
 	}
 
-	// private void OnAttackAreaBodyEntered(PhysicsBody2D body){
-	// 	if (body.IsInGroup("enemy"))
-	// 	body.updateHealth(GD.RandRange(1,5));
-	// }
+	public async void Die(){
+		isDead = true;
+		stateMachine.Travel("death");
+		await ToSignal(GetTree().CreateTimer(1.0),"timeout");
+		GetTree().ReloadCurrentScene();
+	}
+
 	
+	private void OnAttackAreaBodyEntered(CharacterBody2D body){
+		if (body is Slime){
+			slime = (Slime)body;
+			slime.UpdateHealth();
+		}
+	}
 }
