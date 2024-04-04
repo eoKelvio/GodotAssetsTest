@@ -1,17 +1,30 @@
 using Godot;
 using System;
 
-public partial class Slime : CharacterBody2D{
+public partial class Slime : Characters{
     public Sprite2D sprite;
-    public AnimationPlayer animationPlayer;
     public Player player;
     public Vector2 direction;
     public float distance;
-    public bool isDead = false;
+    public RandomNumberGenerator random = new RandomNumberGenerator();
+    // public bool isDead = false;
+    // public ProgressBar healthBar;
+    
 
     public override void _Ready(){
         sprite = GetNode<Sprite2D>("Sprite");
         animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
+        healthBar = GetNode<ProgressBar>("HealthBar");
+        Health(5);        
+    }
+
+     public override void _PhysicsProcess(double delta){
+       if (isDead == true)
+       return;
+       Animation();
+       Detection();
+       MonsterDie();
+       MoveAndSlide();
     }
 
     private void OnBodyEntered(Node2D body){
@@ -22,14 +35,6 @@ public partial class Slime : CharacterBody2D{
     private void OnBodyExit(Node2D body){
         if (body is Player)
         player = null;
-    }
-
-    public override void _PhysicsProcess(double delta){
-       if (isDead == true)
-       return;
-
-       Animation();
-       Detection();
     }
 
     private void Detection(){
@@ -43,11 +48,10 @@ public partial class Slime : CharacterBody2D{
             direction = GlobalPosition.DirectionTo(player.GlobalPosition);
             distance = GlobalPosition.DistanceTo(player.GlobalPosition);
 
-            if (distance < 15){
-                player.Die();
-            }
-            Velocity = direction * 35;
-            MoveAndSlide();
+            // if (distance < 15){
+            //     player.Die();
+            // }
+            Velocity = direction * 30;
             return;
         }
         Velocity = Vector2.Zero;
@@ -67,13 +71,23 @@ public partial class Slime : CharacterBody2D{
         animationPlayer.Play("idle");
     }
 
-    public void UpdateHealth(){
-        isDead = true;
-        animationPlayer.Play("death");
-    }
 
     private void OnAnimationFinished(String animation){
         QueueFree();
     }
-		
+
+    
+
+    private void OnAttackAreaBodyEntered(Characters body){
+
+        if (body is Player){
+
+		    body.DamageInPlayer(random.RandiRange(1,3));
+            return;
+		}
+    }
+
+    private void OnAttackAreaBodyExit (Characters body){
+
+    }
 }

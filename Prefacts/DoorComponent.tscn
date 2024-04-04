@@ -61,6 +61,7 @@ _data = {
 }
 
 [node name="DoorComponent" type="Area2D"]
+collision_mask = 2
 script = ExtResource("1_vh854")
 teleportPosition = Vector2(1200, 27)
 

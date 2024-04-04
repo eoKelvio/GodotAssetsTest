@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://hnbq0eakpykp"]
+[gd_scene load_steps=11 format=3 uid="uid://hnbq0eakpykp"]
 
 [ext_resource type="Script" path="res://Assets/Scripts/Slime.cs" id="1_b45y3"]
 [ext_resource type="Texture2D" uid="uid://bef3mj7s63rqb" path="res://Assets/Sprites/Characters/slime.png" id="1_vid26"]
@@ -82,14 +82,20 @@ _data = {
 [sub_resource type="CircleShape2D" id="CircleShape2D_2ltbe"]
 radius = 74.0068
 
-[node name="Slime" type="CharacterBody2D"]
+[sub_resource type="CircleShape2D" id="CircleShape2D_dpg27"]
+radius = 9.0
+
+[node name="Slime" type="CharacterBody2D" groups=["Enemy"]]
+collision_layer = 4
+collision_mask = 7
 script = ExtResource("1_b45y3")
 
 [node name="Collision" type="CollisionShape2D" parent="."]
+visible = false
 position = Vector2(0, -3)
 shape = SubResource("CircleShape2D_8ejyr")
 
-[node name="Sprite" type="Sprite2D" parent="." groups=["Enemy"]]
+[node name="Sprite" type="Sprite2D" parent="."]
 position = Vector2(0, -5)
 texture = ExtResource("1_vid26")
 hframes = 7
@@ -101,12 +107,34 @@ libraries = {
 }
 
 [node name="DetectionArea" type="Area2D" parent="."]
+collision_layer = 4
+collision_mask = 3
 
 [node name="Colission" type="CollisionShape2D" parent="DetectionArea"]
 visible = false
 show_behind_parent = true
 shape = SubResource("CircleShape2D_2ltbe")
 
+[node name="HealthBar" type="ProgressBar" parent="."]
+modulate = Color(0, 0.654902, 0, 1)
+offset_left = -6.0
+offset_top = 2.0
+offset_right = 124.0
+offset_bottom = 29.0
+scale = Vector2(0.1, 0.1)
+max_value = 5.0
+show_percentage = false
+
+[node name="AttackArea" type="Area2D" parent="."]
+collision_layer = 4
+collision_mask = 2
+
+[node name="Collision" type="CollisionShape2D" parent="AttackArea"]
+position = Vector2(0, -3)
+shape = SubResource("CircleShape2D_dpg27")
+
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="OnAnimationFinished"]
 [connection signal="body_entered" from="DetectionArea" to="." method="OnBodyEntered"]
 [connection signal="body_exited" from="DetectionArea" to="." method="OnBodyExit"]
+[connection signal="body_entered" from="AttackArea" to="." method="OnAttackAreaBodyEntered"]
+[connection signal="body_exited" from="AttackArea" to="." method="OnAttackAreaBodyExit"]
